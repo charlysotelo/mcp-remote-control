@@ -33,14 +33,15 @@ Before using this server, you need to enable external control on your Roku TV:
    - Select **Control by mobile apps**
    - Choose **Network access** and set to **Default** or **Permissive**
 
-2. **Find Your TV's IP Address**:
+2. **Find Your TV's IP Address** *(optional — auto-discovery is supported)*:
    - Go to **Settings** > **Network** > **About**
    - Note the IP address (e.g., `192.168.1.100`)
 
-3. **Set Environment Variable**:
+3. **Set Environment Variable** *(optional)*:
    ```bash
    export HOST_IP=192.168.1.100  # Replace with your TV's IP
    ```
+   If `HOST_IP` is not set, the server will automatically scan the local network for Roku TVs on startup using SSDP. You can also trigger discovery at any time with the `discover_tv()` tool.
 
 ### System Requirements
 
@@ -54,6 +55,7 @@ Before using this server, you need to enable external control on your Roku TV:
 - **App Launching**: Launch apps by name (e.g., "Netflix", "YouTube")
 - **App Discovery**: List all available apps and their IDs
 - **Device Info**: Query device information
+- **Auto-Discovery**: Automatically find Roku TVs on the local network via SSDP — no static IP required
 
 
 ## Getting Started
@@ -165,6 +167,9 @@ Retrieves device information as XML.
 ### `power_on()`
 Powers on the TV.
 
+### `discover_tv()`
+Scans the local network for Roku TVs via SSDP and updates the active TV to the first device found. Useful when `HOST_IP` is not set or when the TV's IP address has changed.
+
 ## Supported Apps
 
 The following apps are supported and can be launched by name using `launch_app()`. App names are case-insensitive and some apps have multiple accepted names (e.g., "Prime Video" or "Amazon Prime Video").
@@ -228,7 +233,17 @@ Assistant: *uses press_key("Pause")*
 - **Connection Failed**: Ensure your TV and computer are on the same network and the TV's IP address is correct
 - **Control Not Working**: Verify that "Control by mobile apps" is enabled in your TV settings
 - **App Not Launching**: Check that the app is installed on your TV using `list_apps()`
-- **Environment Variable**: Make sure `HOST_IP` is set in your shell or MCP client configuration
+- **Environment Variable**: `HOST_IP` is optional — if omitted, auto-discovery runs at startup. Set it explicitly if discovery is slow or unreliable on your network.
+
+### WSL2 Users
+
+SSDP discovery requires an inbound Windows Firewall rule to allow UDP responses from your local network to reach the WSL2 process. Run the following in an **elevated PowerShell** (replace the subnet if your home network differs):
+
+```powershell
+New-NetFirewallRule -DisplayName "Roku SSDP WSL2" -Direction Inbound -Protocol UDP -RemoteAddress 192.168.1.0/24 -Action Allow
+```
+
+Without this rule, SSDP M-SEARCH responses are silently blocked by Windows Firewall. The server will fall back to an HTTP subnet scan, which works but is slower (~5–10 s vs. < 1 s for SSDP).
 
 ## License
 

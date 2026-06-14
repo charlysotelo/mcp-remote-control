@@ -2,7 +2,12 @@ import os
 import httpx
 from mcp.server.fastmcp import FastMCP
 
-from mcp_remote_control.roku_bridge import send_ecp_post, get_device_info as fetch_device_info
+from mcp_remote_control.roku_bridge import (
+    discover_roku,
+    get_device_info as fetch_device_info,
+    get_tv_ip,
+    send_ecp_post,
+)
 
 mcp = FastMCP("tv_control",
                instructions="Tools for controlling a Roku TV via ECP commands over the local network.")
@@ -140,8 +145,32 @@ async def power_on() -> str:
         return f"Failed to send power on command to TV. Check the IP and device status."
 
 
+# --- Tool 6: Discover Roku TVs ---
+
+@mcp.tool()
+async def discover_tv() -> str:
+    """Scans the local network for Roku TVs via SSDP and returns the discovered devices.
+
+    Also updates the active TV to the first device found. Useful when HOST_IP is not
+    configured or when the TV's IP address may have changed.
+    """
+    import mcp_remote_control.roku_bridge as bridge
+
+    devices = await discover_roku()
+    if not devices:
+        return "No Roku TVs found on the local network. Ensure the TV is powered on and 'Control by mobile apps' is enabled in Settings > System > Advanced system settings."
+
+    # Update the cached IP to the first found device
+    bridge._tv_ip = devices[0]["ip"]
+
+    lines = [f"Found {len(devices)} Roku TV(s):"]
+    for i, dev in enumerate(devices):
+        active = " (active)" if i == 0 else ""
+        lines.append(f"  {i + 1}. {dev['ip']}{active}  —  {dev['location']}")
+    return "\n".join(lines)
+
+
 def main():
-    # Initialize and run the server
     mcp.run(transport='stdio')
 
 if __name__ == "__main__":
