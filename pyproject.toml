@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mcp-remote-control"
+name = "mcp-roku-control"
 version = "0.1.1"
 description = "AI-powered local network control for TVs and devices. Currently supports Roku TVs via ECP."
 readme = "README.md"
@@ -20,4 +20,4 @@ where = ["src"]
 "" = "src"
 
 [project.scripts]
-mcp-remote-control = "mcp_remote_control.server:main"
+mcp-roku-control = "mcp_remote_control.server:main"

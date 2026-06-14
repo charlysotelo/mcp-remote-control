@@ -62,17 +62,17 @@ Before using this server, you need to enable external control on your Roku TV:
 
 ### Installation
 
-The package is available on [PyPI](https://pypi.org/project/mcp-remote-control/).
+The package is available on [PyPI](https://pypi.org/project/mcp-roku-control/).
 
 The easiest way to use this server is via [uvx](https://docs.astral.sh/uv/guides/tools/), which runs the package directly from PyPI without requiring a separate install step:
 
 ```bash
-uvx mcp-remote-control
+uvx mcp-roku-control
 ```
 
 Alternatively, install globally with pip:
 ```bash
-pip install mcp-remote-control
+pip install mcp-roku-control
 ```
 
 ### Using with Claude Desktop
@@ -87,7 +87,7 @@ Add this server to your Claude Desktop configuration file:
   "mcpServers": {
     "tv-control": {
       "command": "uvx",
-      "args": ["mcp-remote-control"],
+      "args": ["mcp-roku-control"],
       "env": {
         "HOST_IP": "192.168.1.100"
       }
@@ -130,7 +130,7 @@ To use your local development version with Claude Desktop, point to the cloned d
   "mcpServers": {
     "tv-control": {
       "command": "uv",
-      "args": ["--directory", "/absolute/path/to/mcp-remote-control", "run", "mcp-remote-control"],
+      "args": ["--directory", "/absolute/path/to/mcp-remote-control", "run", "mcp-roku-control"],
       "env": {
         "HOST_IP": "192.168.1.100"
       }
